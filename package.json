@@ -1,0 +1,15 @@
+{
+  "name": "one-shelf",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ONE/SHELF — Unified Wishlist & Self-Hosted Price Tracker",
+  "scripts": {
+    "start": "node server.js",
+    "worker": "node worker.js",
+    "migrate:local": "node scripts/migrate-local-account.js",
+    "test": "node --test server.test.js hosted.test.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

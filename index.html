@@ -1,0 +1,1061 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090b10">
+<title>ONE/SHELF — Personal Product Intelligence</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap');
+:root{--bg:#090b10;--panel:#10141c;--panel2:#151b25;--line:#252d3a;--ink:#f3f6fc;--muted:#8d9aae;--dim:#5d6a7d;--acid:#c7ff5e;--blue:#8ab4ff;--red:#ff8b8b;--r:18px}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% -10%,#1b2c42 0,transparent 34%),var(--bg);color:var(--ink);font-family:Manrope,system-ui,sans-serif;min-height:100vh}
+button,input,select,textarea{font:inherit}button,a{-webkit-tap-highlight-color:transparent}a{color:inherit;text-decoration:none}
+.wrap{width:min(1500px,100%);margin:auto;padding:0 34px}
+.nav{height:78px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
+.logo{font-weight:800;letter-spacing:.17em;font-size:14px}.logo b{color:var(--acid)}
+.navright{display:flex;align-items:center;gap:12px;color:var(--muted);font:10px 'DM Mono',monospace;letter-spacing:.08em}
+.status{display:flex;gap:7px;align-items:center}.dot{width:6px;height:6px;border-radius:50%;background:var(--acid);box-shadow:0 0 12px #c7ff5e88}.dot.offline{background:#f59e0b;box-shadow:0 0 12px #f59e0b88}
+.navbtn,.primary,.secondary,.iconbtn{border:1px solid var(--line);cursor:pointer;color:var(--ink);background:var(--panel2);border-radius:10px;padding:10px 14px;font-size:12px;font-weight:700;transition:.2s}
+.primary{background:var(--acid);border-color:var(--acid);color:#10150a}.primary:hover{background:#d7ff8a;transform:translateY(-1px)}
+button:disabled{opacity:.55;cursor:wait}.secondary:hover,.navbtn:hover{border-color:#66758b}
+.hero{padding:56px 0 32px;display:grid;grid-template-columns:1.3fr .7fr;gap:40px;align-items:end}
+.kicker{font:10px 'DM Mono',monospace;color:var(--acid);letter-spacing:.18em;text-transform:uppercase;margin-bottom:16px}
+.hero h1{font-size:clamp(40px,6vw,82px);letter-spacing:-.075em;line-height:.97;margin:0;font-weight:700;max-width:820px}.hero h1 span{color:var(--acid)}
+.hero p{font-size:13px;line-height:1.85;color:#a1aec0;max-width:460px;margin:0 0 5px}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.overview{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0 36px}
+.metric{border:1px solid var(--line);background:linear-gradient(140deg,#121923,#0d1118);border-radius:14px;padding:17px 18px}
+.metric strong{display:block;font-size:25px;letter-spacing:-.06em}
+.metric span{display:block;color:var(--muted);font:9px 'DM Mono';letter-spacing:.1em;text-transform:uppercase;margin-top:7px}
+.sectionhead{display:flex;justify-content:space-between;align-items:end;gap:18px;margin-bottom:18px}
+.sectionhead h2{font-size:22px;letter-spacing:-.05em;margin:0}.sectionhead p{margin:6px 0 0;color:var(--muted);font-size:11px}
+.count{color:var(--muted);font:10px 'DM Mono';letter-spacing:.08em}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.filters{display:flex;gap:7px;flex-wrap:wrap}
+.filter{border:1px solid var(--line);background:transparent;color:#9aa7ba;border-radius:99px;padding:9px 13px;font:10px 'DM Mono';cursor:pointer}
+.filter.active{background:var(--acid);border-color:var(--acid);color:#10150a}
+.controls{display:flex;gap:8px;align-items:center}
+.search{background:#10141c;border:1px solid var(--line);border-radius:10px;color:var(--ink);padding:10px 12px;width:210px;font-size:11px;outline:none}
+.search:focus,input:focus,textarea:focus,select:focus{border-color:#9bc84b;outline:1px solid #9bc84b44}
+.sort{background:#10141c;border:1px solid var(--line);border-radius:10px;color:var(--ink);padding:10px;font-size:11px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}
+.card{min-width:0;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:16px;background:linear-gradient(155deg,#131923,#0d1118);overflow:hidden;transition:transform .25s,border-color .25s}
+.card:hover{transform:translateY(-4px);border-color:#52647c}
+.card.alert-hit{border-color:var(--acid);box-shadow:0 0 0 1px #c7ff5e33}
+.visual{height:240px;position:relative;display:flex;align-items:center;justify-content:center;background:#e8e9e6;overflow:hidden}
+.visual img{width:100%;height:100%;object-fit:contain;display:block}
+.visual.dark{background:linear-gradient(145deg,#1c2737,#0c111a)}
+.visual .imageflag{position:absolute;left:12px;bottom:12px;border:1px solid #ffffff2e;background:#10141ccf;color:#cbd5e4;border-radius:6px;padding:6px 8px;font:9px 'DM Mono';backdrop-filter:blur(10px)}
+.visual .tag{position:absolute;top:12px;left:12px;background:#0a0d12d9;border:1px solid #ffffff22;border-radius:6px;padding:6px 8px;font:9px 'DM Mono';letter-spacing:.05em}
+.heart{position:absolute;right:12px;top:12px;border:1px solid #ffffff33;background:#0a0d12bd;color:#fff;border-radius:50%;width:34px;height:34px;font-size:17px;cursor:pointer}
+.heart.saved{background:var(--acid);color:#111;border-color:var(--acid)}
+.cardbody{padding:16px;display:flex;flex-direction:column;flex:1}
+.meta{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.category{font:9px 'DM Mono';letter-spacing:.1em;text-transform:uppercase;color:var(--acid)}.source{font:9px 'DM Mono';color:#8492a7}
+.card h3{font-size:15px;line-height:1.4;letter-spacing:-.03em;margin:0 0 8px}
+.desc{font-size:11px;line-height:1.65;color:#9ba8ba;margin:0 0 12px;min-height:38px}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
+.chip{font-size:9px;color:#aab6c6;border:1px solid #303b4b;padding:4px 7px;border-radius:5px}
+.chip.good{border-color:#c7ff5e66;color:var(--acid);background:#c7ff5e12}
+.sparkwrap{background:#0b0f16;border:1px solid #1e2633;border-radius:10px;padding:8px 10px;margin-bottom:12px}
+.sparktop{display:flex;justify-content:space-between;font:9px 'DM Mono';color:var(--muted);margin-bottom:4px}
+.sparkline{width:100%;height:34px;display:block}
+.bottom{margin-top:auto;border-top:1px solid #222c39;padding-top:12px;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.price{font-size:20px;font-weight:700;letter-spacing:-.05em}.price small{display:block;font-size:9px;color:var(--muted);font-weight:500;letter-spacing:.03em;margin-top:2px}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+.view{flex:1;min-width:110px;text-align:center;padding:9px 8px;background:var(--acid);color:#10150a;border-radius:8px;font-size:10px;font-weight:800}
+.edit,.info{border:1px solid #344052;background:transparent;color:#bdc8d7;border-radius:8px;padding:8px 10px;font-size:10px;cursor:pointer}
+.edit:hover,.info:hover{border-color:#66758b;color:var(--ink)}
+.empty{border:1px dashed #334052;border-radius:16px;text-align:center;padding:58px 20px;color:var(--muted);display:none}
+.empty strong{display:block;color:var(--ink);font-size:18px;margin-bottom:8px}.empty p{font-size:12px;line-height:1.7}
+.pipeline{margin:56px 0 26px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(120deg,#111821,#0d1118);padding:26px;display:grid;grid-template-columns:1fr 1.2fr;gap:30px}
+.pipeline h2{font-size:22px;letter-spacing:-.05em;margin:0 0 10px}.pipeline p{font-size:12px;line-height:1.8;color:var(--muted);margin:0}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.step{border-left:1px solid #3b4a5c;padding:5px 0 5px 12px}.step b{font:10px 'DM Mono';color:var(--acid)}.step strong{display:block;font-size:11px;margin:9px 0 5px}.step span{font-size:10px;color:var(--muted);line-height:1.5}
+.footer{border-top:1px solid var(--line);margin-top:36px;padding:25px 0 32px;display:flex;justify-content:space-between;gap:20px;color:#667489;font:9px 'DM Mono';letter-spacing:.07em}
+.modalback{position:fixed;inset:0;background:#03050ad9;backdrop-filter:blur(12px);z-index:20;display:none;align-items:center;justify-content:center;padding:18px}
+.modalback.open{display:flex}
+.modal{width:min(650px,100%);max-height:92vh;overflow:auto;background:#111720;border:1px solid #344052;border-radius:18px;box-shadow:0 30px 100px #0009}
+.modalhead{padding:20px 24px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.modalhead h2{margin:0;font-size:19px;letter-spacing:-.04em}
+.close{background:transparent;border:0;color:#aeb9c9;font-size:24px;cursor:pointer}.modalcontent{padding:20px 24px}
+.notice{border:1px solid #3b4a5c;background:#151e2a;border-radius:10px;padding:12px 13px;color:#aebdd0;font-size:11px;line-height:1.7;margin-bottom:18px}.notice b{color:var(--acid)}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.field{display:flex;flex-direction:column;gap:7px;margin-bottom:13px}.field.full{grid-column:1/-1}
+.field label{font:9px 'DM Mono';color:#9caabd;letter-spacing:.1em;text-transform:uppercase}
+.field input,.field textarea,.field select{width:100%;background:#0a0e14;color:var(--ink);border:1px solid #303b4b;border-radius:9px;padding:11px;font-size:12px}
+.password-row{position:relative}.password-row input{padding-right:62px!important}.password-toggle{position:absolute;right:7px;top:50%;transform:translateY(-50%);border:1px solid #344052;background:#151b25;color:#bdc8d7;border-radius:6px;padding:5px 8px;font-size:10px;font-weight:700;cursor:pointer}.password-toggle:hover{border-color:#66758b;color:var(--ink)}
+.field textarea{min-height:70px;resize:vertical}.field small{font-size:10px;color:var(--dim);line-height:1.5}
+.uploadrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.uploadrow input[type=file]{font-size:10px;max-width:100%;padding:7px}
+.preview{display:none;width:66px;height:66px;border-radius:9px;object-fit:contain;background:#e6e8e4}
+.modalfoot{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:16px 24px;border-top:1px solid var(--line)}.modalfoot small{font-size:10px;color:var(--muted);max-width:300px;line-height:1.5}
+.hist-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.hstat{background:#0b0f16;border:1px solid #242d3b;border-radius:10px;padding:10px}
+.hstat strong{display:block;font-size:16px}.hstat span{font:9px 'DM Mono';color:var(--muted);text-transform:uppercase}
+.hist-list{max-height:200px;overflow:auto;border:1px solid #242d3b;border-radius:10px;margin-top:12px}
+.hist-row{display:flex;justify-content:space-between;padding:9px 12px;border-bottom:1px solid #1b222e;font:11px 'DM Mono'}.hist-row:last-child{border-bottom:0}
+.toast{position:fixed;z-index:40;bottom:24px;left:50%;transform:translate(-50%,18px);opacity:0;pointer-events:none;background:var(--acid);color:#10150a;border-radius:10px;padding:12px 17px;font-size:12px;font-weight:800;transition:.25s;max-width:90%;text-align:center}.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:1120px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{grid-template-columns:1fr .8fr}.pipeline{grid-template-columns:1fr}}
+@media(max-width:680px){.wrap{padding:0 17px}.nav{height:66px}.navright .status{display:none}.hero{grid-template-columns:1fr;gap:20px;padding:42px 0 24px}.overview{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.formgrid,.hist-stats{grid-template-columns:1fr 1fr}.steps{grid-template-columns:1fr}}
+@media(max-width:900px){.navright{gap:7px}.user-chip{display:none}.controls{flex-wrap:wrap}.search{width:min(210px,100%)}}
+#appShell[hidden],#authGate[hidden]{display:none!important}
+.auth-gate{min-height:100vh;display:grid;place-items:center;padding:24px}
+.auth-card{width:min(440px,100%);border:1px solid #344052;border-radius:20px;background:linear-gradient(155deg,#131923,#0d1118);padding:30px;box-shadow:0 30px 100px #0006}
+.auth-card h1{font-size:clamp(34px,8vw,52px);letter-spacing:-.07em;line-height:1;margin:0 0 12px}.auth-card h1 span{color:var(--acid)}
+.auth-copy{font-size:12px;line-height:1.75;color:var(--muted);margin:0 0 22px}
+.auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:16px}
+.auth-tabs[hidden],.auth-link[hidden],.auth-card .field[hidden]{display:none}
+.auth-tab{border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--muted);padding:10px;font-size:11px;font-weight:700;cursor:pointer}
+.auth-tab.active{background:var(--acid);border-color:var(--acid);color:#10150a}
+.auth-card .field{margin-bottom:13px}.auth-message{min-height:18px;color:var(--red);font-size:11px;line-height:1.5;margin:0 0 10px}
+.auth-foot{font-size:10px;line-height:1.6;color:var(--dim);margin:16px 0 0}
+.auth-link{display:block;margin:10px 0 0 auto;padding:0;border:0;background:transparent;color:var(--acid);font-size:10px;cursor:pointer}
+.user-chip{color:#bdc8d7;font:9px 'DM Mono';max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.category-select{background:#10141c;border:1px solid var(--line);border-radius:10px;color:var(--ink);padding:10px;font-size:11px}
+.clothing-fields{display:none}.clothing-fields.visible{display:contents}
+.import-list{max-height:46vh;overflow:auto;padding:0 0 0 25px;margin:0}
+.import-list li{padding:9px 5px;border-bottom:1px solid #222c39;font-size:11px;line-height:1.55}
+.import-list li span{display:block;color:var(--muted);font:9px 'DM Mono';overflow-wrap:anywhere;margin-top:3px}
+.import-list li em{display:inline-block;color:var(--acid);font:9px 'DM Mono';font-style:normal;margin-top:4px}
+</style></head>
+<body>
+<section class="auth-gate" id="authGate" aria-labelledby="authTitle">
+  <div class="auth-card">
+    <div class="kicker">PRIVATE PRODUCT SHELF</div>
+    <h1 id="authTitle">Your finds.<br><span>Your account.</span></h1>
+    <p class="auth-copy">Keep products, categories, and price history together in one private shelf.</p>
+    <div class="auth-tabs" id="authTabs" role="tablist" aria-label="Account action">
+      <button class="auth-tab" id="loginTab" type="button" role="tab">Sign in</button>
+      <button class="auth-tab" id="registerTab" type="button" role="tab">Create account</button>
+    </div>
+    <form id="authForm">
+      <div class="field" id="authEmailField"><label for="authEmail">Email</label><input id="authEmail" type="email" autocomplete="username" maxlength="254" required></div>
+      <div class="field"><label id="authPasswordLabel" for="authPassword">Password</label><div class="password-row"><input id="authPassword" type="password" autocomplete="current-password" minlength="10" maxlength="128" required><button class="password-toggle" id="togglePassword" type="button" aria-controls="authPassword" aria-pressed="false">Show</button></div></div>
+      <p class="auth-message" id="authMessage" role="alert"></p>
+      <button class="primary" id="authSubmit" type="submit" style="width:100%">Sign in</button>
+      <button class="auth-link" id="forgotPasswordBtn" type="button">Forgot password?</button>
+      <button class="auth-link" id="backToLoginBtn" type="button" hidden>Back to sign in</button>
+    </form>
+    <p class="auth-foot" id="authFoot">Your account and shelf are private to you.</p>
+  </div>
+</section>
+<div class="wrap" id="appShell" hidden>
+<header class="nav">
+  <a class="logo" href="#">ONE<b>/</b>SHELF</a>
+  <div class="navright">
+    <span class="status"><i class="dot" id="serverDot"></i> <span id="serverLabel">CONNECTING…</span></span>
+    <span id="savedCount">00 SAVED</span>
+    <span class="user-chip" id="userLabel"></span>
+    <button class="navbtn" id="logoutBtn">Sign out</button>
+    <button class="navbtn" id="syncAllBtn" title="Check live prices for all products">↻ Sync prices</button>
+    <button class="navbtn" id="importProductsBtn">⇧ Import list</button>
+    <button class="navbtn" id="addTop">＋ Add product</button>
+    <input id="importFile" type="file" accept=".md,.txt,text/markdown,text/plain" hidden>
+  </div>
+</header>
+
+<section class="hero">
+  <div>
+    <div class="kicker">Personal product intelligence / v1.0 · Self-hosted price tracker</div>
+    <h1>Your internet finds.<br><span>One command shelf.</span></h1>
+    <div class="hero-actions">
+      <button class="primary" id="addHero">＋ Add a product link</button>
+      <button class="secondary" id="showSaved">♡ Saved items</button>
+      <button class="secondary" id="exportBtn">↓ Export JSON</button>
+    </div>
+  </div>
+  <p>A platform-neutral space for the things you want—with price history tracking, target price alerts, Shopify JSON &amp; public metadata extraction, and optional Keepa/Rainforest adapters for Amazon.in.</p>
+</section>
+
+<section class="overview">
+  <div class="metric"><strong id="totalMetric">00</strong><span>Products in shelf</span></div>
+  <div class="metric"><strong id="alertMetric">00</strong><span>Target price hits</span></div>
+  <div class="metric"><strong id="snapshotMetric">00</strong><span>Price snapshots</span></div>
+  <div class="metric"><strong id="priceMetric">—</strong><span>Known total value</span></div>
+</section>
+
+<section>
+  <div class="sectionhead">
+    <div><h2>The collection</h2><p id="lastSyncText">One inventory · self-hosted price history &amp; original source links</p></div>
+    <span class="count" id="visibleCount">00 ITEMS</span>
+  </div>
+  <div class="toolbar">
+    <div class="filters">
+      <button class="filter active" data-filter="all">All items</button>
+      <button class="filter" data-filter="topwear">Topwear</button>
+      <button class="filter" data-filter="bottomwear">Bottomwear</button>
+      <button class="filter" data-filter="footwear">Footwear</button>
+      <button class="filter" data-filter="underwear">Underwear</button>
+      <button class="filter" data-filter="wearables">Wearables</button>
+      <button class="filter" data-filter="tech">Tech</button>
+      <button class="filter" data-filter="accessories">Accessories</button>
+      <button class="filter" data-filter="alerts">Price hits ★</button>
+      <button class="filter" data-filter="saved">Saved ♡</button>
+    </div>
+    <div class="controls">
+      <select class="category-select" id="clothingTypeFilter" aria-label="Filter by clothing type">
+        <option value="all">All clothing types</option>
+        <optgroup label="Topwear">
+          <option value="shirt">Shirts</option><option value="t-shirt">T-shirts</option><option value="polo">Polos</option>
+          <option value="top">Tops</option><option value="hoodie">Hoodies</option><option value="sweatshirt">Sweatshirts</option><option value="sweater">Sweaters</option><option value="jacket">Jackets</option>
+        </optgroup>
+        <optgroup label="Bottomwear">
+          <option value="jeans">Jeans</option><option value="trousers">Trousers / pants</option><option value="track-pants">Track pants</option>
+          <option value="joggers">Joggers</option><option value="shorts">Shorts</option><option value="skirt">Skirts</option><option value="leggings">Leggings</option>
+        </optgroup>
+        <optgroup label="Underwear"><option value="boxers">Boxers</option><option value="trunks">Trunks</option><option value="briefs">Briefs</option></optgroup>
+        <optgroup label="Footwear">
+          <option value="sneakers">Sneakers</option><option value="shoes">Shoes</option><option value="sandals">Sandals</option><option value="slippers">Slippers</option><option value="boots">Boots</option>
+        </optgroup>
+        <optgroup label="Other clothing">
+          <option value="dress">Dresses</option><option value="jumpsuit">Jumpsuits</option>
+        </optgroup>
+      </select>
+      <input class="search" id="search" placeholder="Search collection…" aria-label="Search collection">
+      <select class="sort" id="sort">
+        <option value="added">Recently added</option>
+        <option value="az">Name A–Z</option>
+        <option value="price">Price low–high</option>
+        <option value="price-desc">Price high–low</option>
+      </select>
+    </div>
+  </div>
+  <main class="grid" id="grid"></main>
+  <div class="empty" id="empty"><strong>Nothing on this shelf yet.</strong><p>Try another filter, or add a product link to bring something in.</p><button class="primary" id="emptyAdd">Add product link</button></div>
+</section>
+
+<section class="pipeline">
+  <div>
+    <div class="kicker">Zero external API dependency</div>
+    <h2>Self-hosted price history<br>with pluggable adapters.</h2>
+    <p>Instead of waiting on third-party tracker approvals, ONE/SHELF records time-series price snapshots in your account, extracts D2C Shopify JSON and public JSON-LD/Open Graph metadata, and supports optional Keepa or Rainforest API keys for Amazon.in.</p>
+  </div>
+  <div class="steps">
+    <div class="step"><b>01</b><strong>Multi-source extractor</strong><span>Uses Shopify JSON for D2C brands, JSON-LD/meta for stores, plus optional Keepa/Rainforest keys.</span></div>
+    <div class="step"><b>02</b><strong>Local time-series DB</strong><span>Stores every price check in data/shelf-db.json to compute min, max, average, and sparklines.</span></div>
+    <div class="step"><b>03</b><strong>Target price alerts</strong><span>Set a target ₹ price per product and run scheduled or one-click price syncs.</span></div>
+  </div>
+</section>
+
+<footer class="footer"><span>ONE/SHELF · SELF-HOSTED WISHLIST &amp; PRICE TRACKER</span><span>PRIVATE LOCAL ACCOUNTS + SERVER DB</span></footer>
+</div>
+
+<!-- Add / Edit Modal -->
+<div class="modalback" id="modalBack" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal">
+    <div class="modalhead"><h2 id="modalTitle">Add to your shelf</h2><button class="close" id="closeModal" aria-label="Close">×</button></div>
+    <form id="productForm">
+      <div class="modalcontent">
+        <div class="notice"><b>Auto-fetch &amp; track:</b> Paste a public product URL and click <b>Fetch product details</b>. ONE/SHELF extracts D2C Shopify JSON, JSON-LD, or Open Graph metadata and records price snapshots in your account.</div>
+        <div class="field">
+          <label for="url">Product URL *</label>
+          <input id="url" type="url" placeholder="https://store.com/product…" required>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px">
+            <button class="secondary" type="button" id="fetchMetadata">↳ Fetch product details</button>
+            <button class="secondary" type="button" id="priceHistoryLookup">↗ Check on PriceHistory</button>
+            <span id="fetchStatus" style="font-size:10px;color:#8d9aae">Ready to fetch public metadata.</span>
+          </div>
+        </div>
+        <div class="formgrid">
+          <div class="field"><label for="name">Product name *</label><input id="name" required placeholder="Product title"></div>
+          <div class="field"><label for="brand">Brand / store</label><input id="brand" placeholder="Detected from URL"></div>
+          <div class="field"><label for="category">Category</label>
+            <select id="category">
+              <option value="fashion">Clothing</option><option value="wearables">Wearables</option>
+              <option value="tech">Tech &amp; electronics</option><option value="home">Home &amp; living</option>
+              <option value="beauty">Beauty &amp; personal care</option><option value="accessories">Accessories</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="formgrid clothing-fields" id="clothingFields">
+            <div class="field"><label for="department">Clothing group</label>
+              <select id="department">
+                <option value="topwear">Topwear</option><option value="bottomwear">Bottomwear</option>
+                <option value="one-piece">One-piece</option><option value="footwear">Footwear</option>
+                <option value="underwear">Underwear</option><option value="other">Other clothing</option>
+              </select>
+            </div>
+            <div class="field"><label for="clothingType">Clothing type</label><select id="clothingType"></select></div>
+          </div>
+          <div class="field"><label for="price">Current price (₹)</label><input id="price" type="number" min="0" step="1" placeholder="e.g. 1299"></div>
+          <div class="field"><label for="targetPrice">Target alert price (₹, optional)</label><input id="targetPrice" type="number" min="0" step="1" placeholder="e.g. 999"></div>
+          <div class="field"><label for="imageUrl">Product image URL (optional)</label><input id="imageUrl" type="url" placeholder="https://…/product.jpg"></div>
+          <div class="field full"><label for="imageFile">Or upload product image</label><div class="uploadrow"><input id="imageFile" type="file" accept="image/*"><img class="preview" id="imagePreview" alt="Preview"></div></div>
+          <div class="field full"><label for="notes">Product details / notes</label><textarea id="notes" placeholder="Key features, size, colour, why you saved it…"></textarea></div>
+        </div>
+      </div>
+      <div class="modalfoot"><small>Saved to your private account. Other accounts cannot see this shelf.</small><button class="primary" type="submit">Save to collection ↗</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modalback" id="importBack" role="dialog" aria-modal="true" aria-labelledby="importTitle">
+  <div class="modal">
+    <div class="modalhead"><h2 id="importTitle">Import product links</h2><button class="close" id="closeImport" aria-label="Close">×</button></div>
+    <div class="modalcontent">
+      <div class="notice" id="importSummary">Review the detected product links and guessed categories before importing.</div>
+      <ol class="import-list" id="importList"></ol>
+    </div>
+    <div class="modalfoot"><small>Titles and categories are guesses from each URL. Prices and images are left blank; verify details after import.</small><button class="primary" id="confirmImport" type="button">Import products</button></div>
+  </div>
+</div>
+
+<!-- Price History Modal -->
+<div class="modalback" id="historyBack" role="dialog" aria-modal="true" aria-labelledby="historyTitle">
+  <div class="modal">
+    <div class="modalhead"><h2 id="historyTitle">Price history</h2><button class="close" id="closeHistory" aria-label="Close">×</button></div>
+    <div class="modalcontent" id="historyBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+const API = '';
+let deploymentMode = 'local';
+const DEPARTMENTS = {
+  topwear: ['shirt', 't-shirt', 'polo', 'top', 'hoodie', 'sweatshirt', 'sweater', 'jacket'],
+  bottomwear: ['jeans', 'trousers', 'track-pants', 'joggers', 'shorts', 'skirt', 'leggings'],
+  'one-piece': ['dress', 'jumpsuit'],
+  footwear: ['sneakers', 'shoes', 'sandals', 'slippers', 'boots'],
+  underwear: ['underwear', 'boxers', 'trunks', 'briefs'],
+  other: ['other']
+};
+const DEPARTMENT_LABELS = { topwear: 'Topwear', bottomwear: 'Bottomwear', 'one-piece': 'One-piece', footwear: 'Footwear', underwear: 'Underwear', other: 'Other clothing' };
+const CLOTHING_LABELS = {
+  shirt: 'Shirt', 't-shirt': 'T-shirt', polo: 'Polo', top: 'Top', hoodie: 'Hoodie', sweatshirt: 'Sweatshirt', sweater: 'Sweater', jacket: 'Jacket',
+  jeans: 'Jeans', trousers: 'Trousers / pants', 'track-pants': 'Track pants', joggers: 'Joggers', shorts: 'Shorts',
+  skirt: 'Skirt', leggings: 'Leggings', dress: 'Dress', jumpsuit: 'Jumpsuit', sneakers: 'Sneakers', shoes: 'Shoes',
+  sandals: 'Sandals', slippers: 'Slippers', boots: 'Boots', underwear: 'Underwear', boxers: 'Boxers', trunks: 'Trunks',
+  briefs: 'Briefs', other: 'Other'
+};
+let products = [], filter = 'all', uploadData = '', serverOnline = false, currentUser = null, authMode = 'login', pendingImport = [], recoveryToken = '';
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money = n => n == null || n === '' ? 'Price not set' : '₹' + Number(n).toLocaleString('en-IN');
+const catLabel = c => ({fashion:'Clothing',wearables:'Wearables',tech:'Tech & electronics',home:'Home & living',beauty:'Beauty & care',accessories:'Accessories',other:'Other'})[c] || 'Other';
+const clothingDepartment = type => Object.keys(DEPARTMENTS).find(department => DEPARTMENTS[department].includes(type)) || 'other';
+
+function domain(url) {
+  try {
+    const h = new URL(url).hostname.replace(/^www\./, '');
+    if (h.includes('amazon')) return 'Amazon';
+    if (h.includes('myntra')) return 'Myntra';
+    if (h.includes('flipkart')) return 'Flipkart';
+    if (h.includes('xyxx')) return 'XYXX';
+    return h.split('.')[0].replace(/\b\w/g, c => c.toUpperCase());
+  } catch { return 'Web store'; }
+}
+
+function toast(m) {
+  $('toast').textContent = m;
+  $('toast').classList.add('show');
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(() => $('toast').classList.remove('show'), 2600);
+}
+
+function setAuthMode(mode, message = '') {
+  authMode = mode;
+  const resetting = mode === 'reset';
+  $('loginTab').classList.toggle('active', mode === 'login');
+  $('registerTab').classList.toggle('active', mode === 'register');
+  $('loginTab').setAttribute('aria-selected', String(mode === 'login'));
+  $('registerTab').setAttribute('aria-selected', String(mode === 'register'));
+  $('authTabs').hidden = resetting;
+  $('authEmailField').hidden = resetting;
+  $('authEmail').required = !resetting;
+  $('forgotPasswordBtn').hidden = mode !== 'login' || deploymentMode !== 'hosted';
+  $('backToLoginBtn').hidden = !resetting;
+  $('authTitle').textContent = resetting ? 'Set a new password' : mode === 'register' ? 'Create your account' : 'Sign in to your shelf';
+  $('authPasswordLabel').textContent = resetting ? 'New password' : 'Password';
+  $('authSubmit').textContent = resetting ? 'Update password' : mode === 'register' ? 'Create account' : 'Sign in';
+  $('authPassword').setAttribute('autocomplete', mode === 'login' ? 'current-password' : 'new-password');
+  $('authPassword').minLength = mode === 'login' ? 1 : 10;
+  $('authPassword').type = 'password';
+  $('togglePassword').textContent = 'Show';
+  $('togglePassword').setAttribute('aria-pressed', 'false');
+  $('togglePassword').setAttribute('aria-label', 'Show password');
+  $('authMessage').textContent = message;
+}
+
+function showAuth(mode = 'login', message = '') {
+  currentUser = null;
+  products = [];
+  $('appShell').hidden = true;
+  $('authGate').hidden = false;
+  $('authForm').reset();
+  setAuthMode(mode, message);
+}
+
+async function initialize() {
+  try {
+    const configResponse = await fetch('/api/config');
+    if (!configResponse.ok) throw Error();
+    const config = await configResponse.json();
+    deploymentMode = config.mode === 'local' ? 'local' : 'hosted';
+    $('authFoot').textContent = deploymentMode === 'hosted'
+      ? 'Sign in securely with your email. Your product shelf is stored in your private cloud account.'
+      : 'Your account and product shelf are stored on this computer.';
+    const health = await fetch('/api/health');
+    if (!health.ok) throw Error();
+    const authHash = new URLSearchParams(location.hash.replace(/^#/, ''));
+    if (authHash.get('type') === 'recovery') {
+      recoveryToken = authHash.get('access_token') || '';
+      history.replaceState(null, '', location.pathname + location.search);
+      if (!recoveryToken) {
+        showAuth('login', 'The password reset link is invalid or expired.');
+        return;
+      }
+      $('appShell').hidden = true;
+      $('authGate').hidden = false;
+      $('authForm').reset();
+      setAuthMode('reset', 'Choose a new password for your account.');
+      return;
+    }
+    if (authHash.has('access_token')) history.replaceState(null, '', location.pathname + location.search);
+    const status = await fetch('/api/auth/status');
+    if (!status.ok) throw Error();
+    const accountStatus = await status.json();
+    const response = await fetch('/api/auth/me');
+    if (response.ok) {
+      const data = await response.json();
+      currentUser = data.user;
+      $('userLabel').textContent = currentUser.email;
+      $('authGate').hidden = true;
+      $('appShell').hidden = false;
+      await loadProducts();
+    } else {
+      showAuth(accountStatus.hasAccounts ? 'login' : 'register');
+    }
+  } catch {
+    showAuth('login', deploymentMode === 'hosted'
+      ? 'The hosted service is unavailable. Try again in a moment.'
+      : 'Cannot reach the local app. Start it with npm start, then reload this page.');
+  }
+}
+
+function updateClothingForm(selectedType = '') {
+  const visible = $('category').value === 'fashion';
+  $('clothingFields').classList.toggle('visible', visible);
+  if (!visible) return;
+  const department = $('department').value || 'topwear';
+  const options = DEPARTMENTS[department] || DEPARTMENTS.other;
+  const select = $('clothingType');
+  select.replaceChildren(new Option('Choose a type', ''));
+  for (const type of options) select.add(new Option(CLOTHING_LABELS[type], type));
+  select.value = options.includes(selectedType) ? selectedType : '';
+}
+
+function canonicalProductUrl(raw) {
+  const url = new URL(raw);
+  url.hash = '';
+  for (const key of [...url.searchParams.keys()]) {
+    if (/^utm_/i.test(key) || ['fbclid', 'gclid', 'eabUserId', 'eab_tests', 'campaign_id', 'ad_id', '_refId', '_appId', 'sourceid', 'client', 'ie'].includes(key)) {
+      url.searchParams.delete(key);
+    }
+  }
+  url.hostname = url.hostname.toLowerCase();
+  if (url.pathname.length > 1) url.pathname = url.pathname.replace(/\/+$/, '');
+  return url.toString();
+}
+
+function guessImportedProduct(raw) {
+  const url = new URL(raw);
+  const text = decodeURIComponent(`${url.hostname}/${url.pathname}`).toLowerCase();
+  const segments = url.pathname.split('/').filter(Boolean);
+  let slug = '';
+  if (/gshock\.casio\./i.test(url.hostname)) slug = segments[segments.length - 1] || '';
+  const productSegment = segments.findIndex(segment => /^(products?|item)$/i.test(segment));
+  if (!slug) {
+    if (productSegment >= 0) slug = segments[productSegment + 1] || '';
+    else if (/snitch\.com$/i.test(url.hostname)) {
+      const categorySegment = segments.findIndex(segment => /^men-|^women-/i.test(segment));
+      slug = segments[categorySegment + 1] || '';
+    }
+    else if (/^dl\.flipkart\.com$/i.test(url.hostname) && /^\/s\//i.test(url.pathname)) slug = '';
+    else if (/flipkart\.com$/i.test(url.hostname)) {
+      const productIdSegment = segments.findIndex(segment => segment === 'p');
+      slug = productIdSegment > 0
+        ? segments[productIdSegment - 1]
+        : segments.find(segment => !/^itm[a-f0-9]+$/i.test(segment) && !/^\d{10,}$/.test(segment)) || '';
+    }
+    else slug = segments.find(segment => !/^(?:dp|p|buy|in|men|women)$/i.test(segment) && !/^itm[a-f0-9]+$/i.test(segment)) || '';
+  }
+  slug = decodeURIComponent(slug).replace(/\.[a-z0-9]{2,5}$/i, '').replace(/[^a-z0-9]+/gi, ' ').trim();
+  let name = slug ? slug.split(/\s+/).map(word => {
+    const lower = word.toLowerCase();
+    if (['kz', 'usb', 'ows', 'eva', 'nbr', '5g', '20k', '1200ml'].includes(lower)) return lower.toUpperCase();
+    return lower.charAt(0).toUpperCase() + lower.slice(1);
+  }).join(' ') : `Product ${url.hostname}`;
+  const host = url.hostname.replace(/^www\./i, '').toLowerCase();
+  if (/gshock\.casio\./i.test(url.hostname)) {
+    name = /ga-b2100/i.test(text) ? 'G-Shock GA-B2100' :
+      /gbm-2100/i.test(text) ? 'G-Shock GBM-2100' : 'G-Shock Gold and Silver Color Collection';
+  }
+  if (host.includes('aliexpress.com')) {
+    const itemId = url.pathname.match(/\/item\/(\d+)/i)?.[1];
+    if (itemId) name = `AliExpress item ${itemId}`;
+  }
+  const brand = host.includes('yoholife') ? 'Yoho' : host.includes('neemans') ? "Neeman's" :
+    host.includes('boldfit') ? 'Boldfit' : host.includes('spiffers') ? 'Spiffers' :
+      host.includes('asianfootwears') ? 'Asian' : host.includes('gshock.casio') ? 'Casio G-Shock' :
+        host.includes('kz-audio') ? 'KZ' : host.includes('boultaudio') ? 'Boult Audio' :
+          host.includes('gonoise') ? 'Noise' : host.includes('freecultr') ? 'Freecultr' :
+            host.includes('snitch') ? 'Snitch' : host.includes('dennison') ? 'Dennison' :
+              host.includes('nobero') ? 'Nobero' : host.includes('blissclub') ? 'Blissclub' :
+                host.includes('aliexpress') ? 'AliExpress' :
+                host.includes('flipkart') ? 'Flipkart' : host.split('.')[0].replace(/\b\w/g, letter => letter.toUpperCase());
+  if (/slipper|\bflips?\b|\bflip[\s-]?flops?\b|sandal|sneaker|footwear|\bshoes?\b|\bboots?\b/.test(text)) {
+    const clothingType = /slipper|\bflips?\b|\bflip[\s-]?flops?\b/.test(text) ? 'slippers' : /sandal/.test(text) ? 'sandals' : /sneaker/.test(text) ? 'sneakers' : 'shoes';
+    return { name, brand, url: raw, category: 'fashion', department: 'footwear', clothingType, review: !slug };
+  }
+  if (/smartwatch|watch|fitness tracker|wearable|g-shock|gshock|ga-b2100|gbm-2100/.test(text)) {
+    return { name, brand, url: raw, category: 'wearables', department: '', clothingType: '', review: /gold-and-silver-color/.test(text) };
+  }
+  if (/boxers?|trunks?|briefs?|underwear|innerwear/.test(text)) {
+    const clothingType = /trunks?/.test(text) ? 'trunks' : /briefs?/.test(text) ? 'briefs' : 'boxers';
+    return { name, brand, url: raw, category: 'fashion', department: 'underwear', clothingType, review: false };
+  }
+  if (/jeans?|trousers?|track[\s-]?pants?|joggers?|shorts?|leggings?|skirts?/.test(text)) {
+    const clothingType = /track[\s-]?pants?/.test(text) ? 'track-pants' : /jeans?/.test(text) ? 'jeans' :
+      /joggers?/.test(text) ? 'joggers' : /leggings?/.test(text) ? 'leggings' :
+        /shorts?/.test(text) ? 'shorts' : /skirts?/.test(text) ? 'skirt' : 'trousers';
+    return { name, brand, url: raw, category: 'fashion', department: 'bottomwear', clothingType, review: false };
+  }
+  if (/t-?shirts?|tees?|polo|sweatshirt|hoodie|jacket|shirt/.test(text)) {
+    const clothingType = /t-?shirts?|tees?/.test(text) ? 't-shirt' : /polo/.test(text) ? 'polo' :
+      /sweatshirts?/.test(text) ? 'sweatshirt' : /hoodies?/.test(text) ? 'hoodie' : /jackets?/.test(text) ? 'jacket' : 'shirt';
+    return { name, brand, url: raw, category: 'fashion', department: 'topwear', clothingType, review: false };
+  }
+  if (/headphone|earphone|earbud|audio|powerbank|power-bank|mobile|phone|armor-mini/.test(text)) {
+    return { name, brand, url: raw, category: 'tech', department: '', clothingType: '', review: !slug };
+  }
+  if (/yoga-mat|tumbler|kitchen|home/.test(text)) {
+    return { name, brand, url: raw, category: 'home', department: '', clothingType: '', review: false };
+  }
+  if (/backpacks?|handbags?|tote bags?|duffel bags?|wallets?|sunglasses|eyewear|belts?|caps?|beanies?|scarves|jewel[lr]y|bracelets?|necklaces?|earrings?|accessories/.test(text)) {
+    return { name, brand, url: raw, category: 'accessories', department: '', clothingType: '', review: false };
+  }
+  return { name, brand, url: raw, category: 'other', department: '', clothingType: '', review: true };
+}
+
+async function previewProductFile(file) {
+  const text = await file.text();
+  const rejectedHosts = ['search.app', 'youtube.com', 'youtu.be', 'rediff.com', 'notebookcheck.net', 'timesnownews.com'];
+  const urls = new Set();
+  let skipped = 0;
+  for (const line of text.split(/\r?\n/)) {
+    const unescaped = line.replace(/\\(?=[^\w\s])/g, '');
+    for (const match of unescaped.matchAll(/https?:\/\/[^\s)<>\]]+/gi)) {
+      const raw = match[0].replace(/[.,;]+$/, '');
+      try {
+        const url = new URL(raw);
+        const host = url.hostname.toLowerCase();
+        if (!['http:', 'https:'].includes(url.protocol) || rejectedHosts.some(blocked => host === blocked || host.endsWith(`.${blocked}`)) ||
+            (host === 'www.google.com' && url.pathname === '/search')) {
+          skipped++;
+          continue;
+        }
+        const canonical = canonicalProductUrl(url.toString());
+        if (urls.has(canonical)) {
+          skipped++;
+          continue;
+        }
+        urls.add(canonical);
+      } catch {
+        skipped++;
+      }
+    }
+  }
+  const candidates = [...urls].map(guessImportedProduct);
+  const existing = new Set(products.map(product => {
+    try { return canonicalProductUrl(product.url); } catch { return ''; }
+  }));
+  pendingImport = candidates.filter(product => !existing.has(canonicalProductUrl(product.url)));
+  const alreadySaved = candidates.length - pendingImport.length;
+  const reviews = pendingImport.filter(product => product.review).length;
+  const counts = pendingImport.reduce((result, product) => {
+    const label = product.category === 'fashion' ? DEPARTMENT_LABELS[product.department] : catLabel(product.category);
+    result[label] = (result[label] || 0) + 1;
+    return result;
+  }, {});
+  $('importSummary').textContent = `${candidates.length} unique links found; ${alreadySaved} already on your shelf, ${skipped} duplicate/non-product links skipped. ${pendingImport.length} will be added; ${reviews} need category/title review. Guessed groups: ${Object.entries(counts).map(([label, count]) => `${label} ${count}`).join(' · ') || 'none'}.`;
+  $('importList').innerHTML = pendingImport.map(product =>
+    `<li>${esc(product.name)} <span>${esc(product.brand)} · ${esc(new URL(product.url).hostname)} · ${esc(product.url)}</span><em>${esc(product.category === 'fashion' ? `${DEPARTMENT_LABELS[product.department]} · ${CLOTHING_LABELS[product.clothingType]}` : catLabel(product.category))}${product.review ? ' · REVIEW' : ''}</em></li>`
+  ).join('') || '<li>Everything in this file is already on your shelf.</li>';
+  $('confirmImport').disabled = pendingImport.length === 0;
+  $('confirmImport').textContent = pendingImport.length ? `Import ${pendingImport.length} products` : 'Nothing to import';
+  $('importBack').classList.add('open');
+}
+
+function sparklineSvg(history, w = 240, h = 34) {
+  const pts = (history || []).map(x => Number(x.price)).filter(n => Number.isFinite(n) && n > 0);
+  if (pts.length < 2) return `<svg class="sparkline" viewBox="0 0 ${w} ${h}"><line x1="0" y1="${h/2}" x2="${w}" y2="${h/2}" stroke="#2b3647" stroke-dasharray="3 3"/></svg>`;
+  const min = Math.min(...pts), max = Math.max(...pts), span = max - min || 1;
+  const coords = pts.map((v, i) => {
+    const x = (i / (pts.length - 1)) * (w - 8) + 4;
+    const y = h - 5 - ((v - min) / span) * (h - 10);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(' ');
+  return `<svg class="sparkline" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><polyline fill="none" stroke="#c7ff5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="${coords}"/></svg>`;
+}
+
+async function loadProducts() {
+  try {
+    const h = await fetch(API + '/api/health');
+    if (!h.ok) throw Error('Price tracker is unavailable.');
+    const info = await h.json();
+    const r = await fetch(API + '/api/products');
+    if (r.status === 401) {
+      showAuth('login', 'Your session expired. Sign in again.');
+      return false;
+    }
+    if (!r.ok) throw Error('Could not load this account’s shelf.');
+    const data = await r.json();
+    serverOnline = true;
+    $('serverDot').classList.remove('offline');
+    $('serverLabel').textContent = info.mode === 'hosted'
+      ? 'TRACKER ONLINE · CLOUD'
+      : `TRACKER ONLINE · ${info.adapters.keepaApi || info.adapters.rainforestApi ? 'API + LOCAL' : 'LOCAL ENGINE'}`;
+    if (data.lastTrackRun) $('lastSyncText').textContent = 'Last background sync: ' + new Date(data.lastTrackRun).toLocaleString('en-IN');
+    products = data.products || [];
+    render();
+    return true;
+  } catch (error) {
+    serverOnline = false;
+    products = [];
+    $('serverDot').classList.add('offline');
+    $('serverLabel').textContent = 'TRACKER OFFLINE';
+    toast(error.message || 'The price tracker is unavailable.');
+    return false;
+  }
+}
+
+function card(p) {
+  const s = p.stats || {};
+  const img = p.image
+    ? `<img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy" onerror="this.remove();this.parentElement.classList.add('dark');this.parentElement.querySelector('.imageflag').textContent='IMAGE UNAVAILABLE'">`
+    : `<div style="text-align:center;padding:20px;color:#aebbd0"><div style="font:10px 'DM Mono';letter-spacing:.16em;color:#c7ff5e;margin-bottom:8px">IMAGE NOT ATTACHED</div><div style="font-size:11px;line-height:1.6">Click Fetch or Edit to add image.</div></div>`;
+  const targetNote = p.targetPrice ? `Target: ${money(p.targetPrice)}` : 'No target set';
+  const categoryName = p.category === 'fashion' && p.department
+    ? `${DEPARTMENT_LABELS[p.department] || 'Clothing'}${p.clothingType ? ' · ' + (CLOTHING_LABELS[p.clothingType] || 'Other') : ''}`
+    : catLabel(p.category);
+  return `<article class="card ${s.belowTarget ? 'alert-hit' : ''}" data-id="${esc(p.id)}">
+    <div class="visual ${p.image ? '' : 'dark'}">${img}<span class="tag">${esc(domain(p.url))}</span><button class="heart ${p.saved ? 'saved' : ''}" data-heart="${esc(p.id)}">${p.saved ? '♥' : '♡'}</button><span class="imageflag">${s.belowTarget ? '★ TARGET HIT' : (s.isAtLowest ? '↓ ALL-TIME LOW' : (p.image ? 'PRODUCT IMAGE' : 'IMAGE NEEDED'))}</span></div>
+    <div class="cardbody">
+      <div class="meta"><span class="category">${esc(categoryName)}</span><span class="source">${esc(p.brand || domain(p.url))}</span></div>
+      <h3>${esc(p.name)}</h3>
+      <p class="desc">${esc(p.notes || 'No extra notes added.')}</p>
+      <div class="chips">
+        ${s.belowTarget ? '<span class="chip good">Below target</span>' : ''}
+        ${s.isAtLowest ? '<span class="chip good">Lowest recorded</span>' : ''}
+        ${(p.tags || []).slice(0, 2).map(t => `<span class="chip">${esc(t)}</span>`).join('')}
+      </div>
+      <div class="sparkwrap">
+        <div class="sparktop"><span>Low ${s.lowestPrice ? money(s.lowestPrice) : '—'}</span><span>${s.snapshots || 0} pts</span><span>High ${s.highestPrice ? money(s.highestPrice) : '—'}</span></div>
+        ${sparklineSvg(p.priceHistory)}
+      </div>
+      <div class="bottom">
+        <div class="price">${esc(money(p.price))}<small>${esc(targetNote)}</small></div>
+        <button class="edit" data-check="${esc(p.id)}" title="Fetch live price now">↻ Check</button>
+      </div>
+      <div class="actions">
+        <a class="view" href="${esc(p.url)}" target="_blank" rel="noopener noreferrer">Open store ↗</a>
+        <button class="edit" data-history="${esc(p.id)}">History</button>
+        <button class="edit" data-edit="${esc(p.id)}">Edit</button>
+        <button class="info" data-remove="${esc(p.id)}" title="Remove">×</button>
+      </div>
+    </div>
+  </article>`;
+}
+
+function render() {
+  const q = $('search').value.toLowerCase().trim();
+  const clothingType = $('clothingTypeFilter').value;
+  const visible = products.filter(p => {
+    const matchFilter = filter === 'all' ||
+      (filter === 'saved' ? p.saved :
+        filter === 'alerts' ? p.stats?.belowTarget :
+          Object.hasOwn(DEPARTMENTS, filter)
+            ? p.category === 'fashion' && p.department === filter
+            : p.category === filter);
+    const matchClothingType = clothingType === 'all' || p.clothingType === clothingType;
+    const matchSearch = !q || [p.name, p.brand, p.notes, p.url, catLabel(p.category), DEPARTMENT_LABELS[p.department], CLOTHING_LABELS[p.clothingType]].join(' ').toLowerCase().includes(q);
+    return matchFilter && matchClothingType && matchSearch;
+  });
+  const sort = $('sort').value;
+  if (sort === 'az') visible.sort((a, b) => a.name.localeCompare(b.name));
+  if (sort === 'price' || sort === 'price-desc') {
+    const direction = sort === 'price' ? 1 : -1;
+    visible.sort((a, b) => {
+      const aPrice = a.price ?? a.stats?.currentPrice ?? null;
+      const bPrice = b.price ?? b.stats?.currentPrice ?? null;
+      if (aPrice == null && bPrice == null) return a.name.localeCompare(b.name);
+      if (aPrice == null) return 1;
+      if (bPrice == null) return -1;
+      return (Number(aPrice) - Number(bPrice)) * direction;
+    });
+  }
+  if (sort === 'added') visible.sort((a, b) => (b.added || 0) - (a.added || 0));
+  document.querySelectorAll('.filter').forEach(button => button.classList.toggle('active', button.dataset.filter === filter));
+
+  $('grid').innerHTML = visible.map(card).join('');
+  $('empty').style.display = visible.length ? 'none' : 'block';
+  $('visibleCount').textContent = String(visible.length).padStart(2, '0') + ' ITEMS';
+  $('totalMetric').textContent = String(products.length).padStart(2, '0');
+  $('alertMetric').textContent = String(products.filter(p => p.stats?.belowTarget).length).padStart(2, '0');
+  $('snapshotMetric').textContent = String(products.reduce((s, p) => s + (p.priceHistory?.length || 0), 0)).padStart(2, '0');
+  const known = products.filter(p => p.price != null).reduce((s, p) => s + Number(p.price), 0);
+  $('priceMetric').textContent = known ? '₹' + known.toLocaleString('en-IN') : '—';
+  $('savedCount').textContent = String(products.filter(p => p.saved).length).padStart(2, '0') + ' SAVED';
+}
+
+function openModal(p) {
+  $('productForm').reset();
+  uploadData = '';
+  $('imagePreview').style.display = 'none';
+  $('modalTitle').textContent = p ? 'Edit product' : 'Add to your shelf';
+  $('productForm').dataset.editId = p?.id || '';
+  if (p) {
+    $('url').value = p.url; $('name').value = p.name; $('brand').value = p.brand || '';
+    $('category').value = p.category; $('department').value = p.department || 'topwear';
+    $('price').value = p.price ?? ''; $('targetPrice').value = p.targetPrice ?? '';
+    $('imageUrl').value = p.image?.startsWith('data:') ? '' : (p.image || '');
+    $('notes').value = p.notes || '';
+    if (p.image) { $('imagePreview').src = p.image; $('imagePreview').style.display = 'block'; }
+  }
+  updateClothingForm(p?.clothingType || '');
+  $('modalBack').classList.add('open');
+  setTimeout(() => $('url').focus(), 40);
+}
+
+function closeImportModal() {
+  $('importBack').classList.remove('open');
+  pendingImport = [];
+}
+
+function openHistoryModal(p) {
+  const s = p.stats || {};
+  const rows = (p.priceHistory || []).slice().reverse().map(h =>
+    `<div class="hist-row"><span>${new Date(h.recordedAt).toLocaleString('en-IN')}</span><span>${esc(h.method || 'check')}</span><strong>${esc(money(h.price))}</strong></div>`
+  ).join('') || '<div class="hist-row"><span>No price snapshots recorded yet. Click "↻ Check" to record live price.</span></div>';
+  $('historyTitle').textContent = p.name;
+  $('historyBody').innerHTML = `
+    <div class="hist-stats">
+      <div class="hstat"><strong>${esc(money(s.currentPrice))}</strong><span>Current</span></div>
+      <div class="hstat"><strong>${esc(money(s.lowestPrice))}</strong><span>Lowest</span></div>
+      <div class="hstat"><strong>${esc(money(s.averagePrice))}</strong><span>Average</span></div>
+      <div class="hstat"><strong>${esc(money(s.highestPrice))}</strong><span>Highest</span></div>
+    </div>
+    <div class="sparkwrap" style="padding:14px">${sparklineSvg(p.priceHistory, 560, 90)}</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+      <span style="font-size:11px;color:var(--muted)">Snapshots (${s.snapshots || 0})</span>
+      <a class="secondary" href="https://pricehistory.app/?search=${encodeURIComponent(p.url)}" target="_blank" rel="noopener noreferrer">Cross-check on PriceHistory ↗</a>
+    </div>
+    <div class="hist-list">${rows}</div>`;
+  $('historyBack').classList.add('open');
+}
+
+$('loginTab').addEventListener('click', () => setAuthMode('login'));
+$('registerTab').addEventListener('click', () => setAuthMode('register'));
+$('backToLoginBtn').addEventListener('click', () => {
+  recoveryToken = '';
+  setAuthMode('login');
+});
+$('forgotPasswordBtn').addEventListener('click', async () => {
+  const email = $('authEmail').value.trim();
+  if (!email || !$('authEmail').checkValidity()) {
+    $('authEmail').reportValidity();
+    return;
+  }
+  const button = $('forgotPasswordBtn');
+  button.disabled = true;
+  try {
+    const response = await fetch('/api/auth/recovery', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    const data = await response.json();
+    if (!response.ok) throw Error(data.error || 'Password recovery is unavailable.');
+    $('authMessage').textContent = data.message;
+  } catch (error) {
+    $('authMessage').textContent = error.message || 'Password recovery is unavailable.';
+  } finally {
+    button.disabled = false;
+  }
+});
+$('togglePassword').addEventListener('click', () => {
+  const visible = $('authPassword').type === 'password';
+  $('authPassword').type = visible ? 'text' : 'password';
+  $('togglePassword').textContent = visible ? 'Hide' : 'Show';
+  $('togglePassword').setAttribute('aria-pressed', String(visible));
+  $('togglePassword').setAttribute('aria-label', `${visible ? 'Hide' : 'Show'} password`);
+});
+$('authForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const submit = $('authSubmit');
+  submit.disabled = true;
+  $('authMessage').textContent = '';
+  try {
+    if (authMode === 'reset') {
+      const response = await fetch('/api/auth/password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: recoveryToken, password: $('authPassword').value })
+      });
+      const data = await response.json();
+      if (!response.ok) throw Error(data.error || 'Could not update the password.');
+      recoveryToken = '';
+      history.replaceState(null, '', location.pathname + location.search);
+      showAuth('login', 'Password updated. Sign in with your new password.');
+      return;
+    }
+    const response = await fetch(`/api/auth/${authMode}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: $('authEmail').value, password: $('authPassword').value })
+    });
+    const data = await response.json();
+    if (!response.ok) throw Error(data.error || 'Could not sign in.');
+    if (data.requiresEmailConfirmation) {
+      $('authPassword').value = '';
+      setAuthMode('login', 'Check your email to confirm the account, then sign in.');
+      return;
+    }
+    currentUser = data.user;
+    $('authPassword').value = '';
+    $('userLabel').textContent = currentUser.email;
+    $('authGate').hidden = true;
+    $('appShell').hidden = false;
+    await loadProducts();
+  } catch (error) {
+    $('authMessage').textContent = error.message || 'The authentication service could not be reached.';
+  } finally {
+    submit.disabled = false;
+  }
+});
+
+$('logoutBtn').addEventListener('click', async () => {
+  let message = 'You are signed out.';
+  try {
+    const response = await fetch('/api/auth/logout', { method: 'POST' });
+    if (!response.ok) message = 'Signed out here, but the server could not revoke the session.';
+  } catch {
+    message = 'Signed out here; the service was unreachable, so the session may still be active.';
+  }
+  filter = 'all';
+  $('clothingTypeFilter').value = 'all';
+  showAuth('login', message);
+});
+
+$('importProductsBtn').addEventListener('click', () => $('importFile').click());
+$('importFile').addEventListener('change', async e => {
+  const file = e.target.files?.[0];
+  e.target.value = '';
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) return toast('Choose a product list smaller than 2 MB.');
+  try { await previewProductFile(file); }
+  catch (error) { toast(error.message || 'Could not read the selected product list.'); }
+});
+$('closeImport').addEventListener('click', closeImportModal);
+$('importBack').addEventListener('click', e => {
+  if (e.target === $('importBack')) closeImportModal();
+});
+$('confirmImport').addEventListener('click', async () => {
+  if (!pendingImport.length) return;
+  const button = $('confirmImport');
+  button.disabled = true;
+  button.textContent = 'Importing…';
+  try {
+    const response = await fetch('/api/products/import', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        products: pendingImport.map(product => ({
+          ...product,
+          notes: product.review
+            ? 'Imported from Products.md. Review the estimated title/category; price and image were not imported.'
+            : 'Imported from Products.md. Verify the estimated title, category, price, and image.'
+        }))
+      })
+    });
+    const data = await response.json();
+    if (!response.ok) throw Error(data.error || 'Product list could not be imported.');
+    closeImportModal();
+    await loadProducts();
+    toast(`Imported ${data.added} products; skipped ${data.duplicates} duplicates and ${data.invalid} invalid links.`);
+  } catch (error) {
+    $('importSummary').textContent = error.message || 'Import failed. Check the service and try again.';
+  } finally {
+    button.disabled = pendingImport.length === 0;
+    button.textContent = pendingImport.length ? `Import ${pendingImport.length} products` : 'Import products';
+  }
+});
+
+['addTop', 'addHero', 'emptyAdd'].forEach(id => $(id).addEventListener('click', () => openModal()));
+$('closeModal').addEventListener('click', () => $('modalBack').classList.remove('open'));
+$('closeHistory').addEventListener('click', () => $('historyBack').classList.remove('open'));
+$('category').addEventListener('change', () => updateClothingForm());
+$('department').addEventListener('change', () => updateClothingForm());
+$('priceHistoryLookup').addEventListener('click', () => {
+  const u = $('url').value.trim();
+  if (!u) return toast('Paste a product URL first.');
+  window.open('https://pricehistory.app/?search=' + encodeURIComponent(u), '_blank', 'noopener,noreferrer');
+});
+
+$('imageFile').addEventListener('change', e => {
+  const f = e.target.files?.[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = () => { uploadData = r.result; $('imagePreview').src = uploadData; $('imagePreview').style.display = 'block'; };
+  r.readAsDataURL(f);
+});
+
+$('fetchMetadata').addEventListener('click', async () => {
+  const url = $('url').value.trim();
+  if (!url) return toast('Paste a product URL first.');
+  const btn = $('fetchMetadata'), status = $('fetchStatus');
+  btn.disabled = true; btn.textContent = 'Fetching…'; status.textContent = 'Extracting metadata…';
+  try {
+    const r = await fetch(API + '/api/preview', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url }) });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Could not fetch page.');
+    if (d.title) $('name').value = d.title;
+    if (d.brand) $('brand').value = d.brand;
+    if (d.image) { $('imageUrl').value = d.image; $('imagePreview').src = d.image; $('imagePreview').style.display = 'block'; }
+    if (d.price != null) $('price').value = d.price;
+    if (d.description && !$('notes').value.trim()) $('notes').value = d.description;
+    if (d.category) $('category').value = d.category;
+    if (d.department) $('department').value = d.department;
+    updateClothingForm(d.clothingType || '');
+    status.textContent = `Extracted via ${d.method}. Review and save.`;
+    toast('Product details fetched!');
+  } catch (e) {
+    status.textContent = e.message;
+    toast('Auto-fetch blocked by store; enter details manually.');
+  } finally { btn.disabled = false; btn.textContent = '↳ Fetch product details'; }
+});
+
+$('productForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const editId = e.currentTarget.dataset.editId;
+  const payload = {
+    id: editId || undefined,
+    url: $('url').value.trim(),
+    name: $('name').value.trim(),
+    brand: $('brand').value.trim() || domain($('url').value.trim()),
+    category: $('category').value,
+    department: $('department').value,
+    clothingType: $('clothingType').value,
+    price: $('price').value === '' ? null : Number($('price').value),
+    targetPrice: $('targetPrice').value === '' ? null : Number($('targetPrice').value),
+    image: uploadData || $('imageUrl').value.trim(),
+    notes: $('notes').value.trim()
+  };
+  try {
+    const response = await fetch(API + '/api/products', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await response.json();
+    if (!response.ok) throw Error(data.error || 'Product could not be saved.');
+    $('modalBack').classList.remove('open');
+    await loadProducts();
+    toast('Saved to shelf');
+  } catch (error) {
+    toast(error.message || 'Could not save product. Check the service.');
+  }
+});
+
+$('grid').addEventListener('click', async e => {
+  const chk = e.target.closest('[data-check]');
+  if (chk) {
+    if (!serverOnline) return toast('The price tracker is unavailable.');
+    chk.disabled = true; chk.textContent = '…';
+    try {
+      const r = await fetch(`${API}/api/products/${encodeURIComponent(chk.dataset.check)}/check`, { method: 'POST' });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error);
+      await loadProducts();
+      toast(d.updated ? `Price updated: ${money(d.product.price)}` : 'Checked — no price change');
+    } catch (err) { toast(err.message); }
+    finally { chk.disabled = false; chk.textContent = '↻ Check'; }
+    return;
+  }
+  const hist = e.target.closest('[data-history]');
+  if (hist) { const p = products.find(x => x.id === hist.dataset.history); if (p) openHistoryModal(p); return; }
+  const hrt = e.target.closest('[data-heart]');
+  if (hrt) {
+    const p = products.find(x => x.id === hrt.dataset.heart);
+    if (!p) return;
+    try {
+      const response = await fetch(API + '/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...p, saved: !p.saved })
+      });
+      if (!response.ok) throw Error('Could not update saved status.');
+      await loadProducts();
+    } catch (error) { toast(error.message); }
+    return;
+  }
+  const ed = e.target.closest('[data-edit]');
+  if (ed) { openModal(products.find(x => x.id === ed.dataset.edit)); return; }
+  const rm = e.target.closest('[data-remove]');
+  if (rm) {
+    const p = products.find(x => x.id === rm.dataset.remove);
+    if (p && confirm(`Remove "${p.name}"?`)) {
+      try {
+        const response = await fetch(`${API}/api/products/${encodeURIComponent(p.id)}`, { method: 'DELETE' });
+        if (!response.ok) throw Error('Could not remove product.');
+        await loadProducts();
+        toast('Removed');
+      } catch (error) { toast(error.message); }
+    }
+  }
+});
+
+$('syncAllBtn').addEventListener('click', async () => {
+  if (!serverOnline) return toast('The price tracker is unavailable.');
+  $('syncAllBtn').disabled = true; $('syncAllBtn').textContent = '↻ Syncing…';
+  try {
+    const r = await fetch(API + '/api/track-all', { method: 'POST' });
+    const d = await r.json();
+    if (!r.ok) throw Error(d.error || 'Price sync failed.');
+    products = d.products || products;
+    render();
+    if (d.backgroundTracking) {
+      toast(d.message || 'Price checks will run in the background.');
+      return;
+    }
+    const okCount = (d.results || []).filter(x => x.ok && x.price != null).length;
+    toast(`Synced ${okCount}/${(d.results || []).length} products`);
+  } catch (error) { toast(error.message || 'Sync failed'); }
+  finally { $('syncAllBtn').disabled = false; $('syncAllBtn').textContent = '↻ Sync prices'; }
+});
+
+$('exportBtn').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify({ exportedAt: new Date().toISOString(), products }, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'oneshelf-export.json'; a.click();
+});
+
+document.querySelectorAll('.filter').forEach(b => b.addEventListener('click', () => {
+  filter = b.dataset.filter;
+  const type = $('clothingTypeFilter').value;
+  if (type !== 'all' && filter !== 'all' && filter !== clothingDepartment(type) && filter !== 'saved' && filter !== 'alerts') {
+    $('clothingTypeFilter').value = 'all';
+  }
+  render();
+}));
+$('clothingTypeFilter').addEventListener('change', () => {
+  const type = $('clothingTypeFilter').value;
+  filter = type === 'all' ? 'all' : clothingDepartment(type);
+  render();
+});
+$('search').addEventListener('input', render);
+$('sort').addEventListener('change', render);
+$('showSaved').addEventListener('click', () => {
+  filter = 'saved';
+  document.querySelectorAll('.filter').forEach(x => x.classList.toggle('active', x.dataset.filter === 'saved'));
+  render();
+});
+
+initialize();
+</script></body></html>

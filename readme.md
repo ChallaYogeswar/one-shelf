@@ -20,11 +20,25 @@ Without Supabase environment variables, the app uses the local JSON account and 
 ### Supabase setup
 
 1. Create a Supabase project and enable email/password sign-in. Email confirmation is recommended.
-2. In the Supabase SQL Editor, run [`supabase/schema.sql`](./supabase/schema.sql).
-3. In Supabase Auth URL Configuration, set the production site URL and add your local/preview URLs to the redirect allow-list. Configure a production SMTP provider for confirmation and password-reset email delivery.
-4. Save the project URL, anon/publishable key, and service-role/secret key. Never expose the service-role key.
+2. From the project root, authenticate and link the CLI:
 
-The schema creates `products`, per-user tracking settings, RLS policies, a new-user settings trigger, and a private image bucket. Product and image rows are scoped by `auth.uid()`.
+   ```powershell
+   npx supabase login
+   npx supabase link --project-ref YOUR_PROJECT_REF
+   ```
+
+3. Review the migration status, then apply pending migrations:
+
+   ```powershell
+   npx supabase migration list --remote
+   npx supabase db push --remote
+   ```
+
+   The initial migration creates the tables, RLS policies, signup trigger, and private image bucket on a new project. Never commit your Supabase access token or database password.
+4. In Supabase Auth URL Configuration, set the production site URL and add your local/preview URLs to the redirect allow-list. Configure a production SMTP provider for confirmation and password-reset email delivery.
+5. Save the project URL, anon/publishable key, and service-role/secret key. Never expose the service-role key.
+
+The migrations in [`supabase/migrations/`](./supabase/migrations/) are the deployable schema history; [`supabase/schema.sql`](./supabase/schema.sql) is a convenient reference copy. Product and image rows are scoped by `auth.uid()`.
 
 ### Local hosted-mode test
 
